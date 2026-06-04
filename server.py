@@ -9,11 +9,9 @@ No code changes needed here.
 """
 
 import json
-import os
 import re
 import subprocess
 import sys
-import tempfile
 import time
 import urllib.parse
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -22,6 +20,20 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 STATE_FILE = BASE_DIR / "state" / "progress.json"
 UPLOADS_DIR = BASE_DIR / "uploads"
+
+# Hostnames the server will answer to. Binding to localhost already keeps the
+# socket off the network; this also rejects DNS-rebinding requests that arrive
+# with a forged Host header.
+ALLOWED_HOSTNAMES = {"localhost", "127.0.0.1", "::1", "[::1]"}
+
+
+def is_safe_segment(name):
+    """True if `name` is a single, traversal-free path segment.
+
+    Rejects empty values, path separators, NUL bytes, and any '..' so a
+    user-supplied cardId/filename can't escape its intended directory.
+    """
+    return bool(name) and not any(c in name for c in ("/", "\\", "\x00")) and ".." not in name
 
 
 def read_state():
@@ -120,9 +132,50 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
         super().end_headers()
 
+    # ── CSRF / DNS-rebinding guards ──────────────────────────────
+    # The server runs on localhost, but any web page the user visits can still
+    # send requests to it. These checks make sure requests come from the app
+    # itself (same origin) and not from a hostile page or a rebound DNS name.
+
+    def _hostname_ok(self):
+        host = self.headers.get("Host", "")
+        hostname = host.rsplit(":", 1)[0] if ":" in host else host
+        return hostname in ALLOWED_HOSTNAMES
+
+    def _same_origin(self):
+        """False only when we can positively tell the request is cross-site.
+
+        Modern browsers send `Sec-Fetch-Site` (and `Origin` on POSTs); a hostile
+        page's request carries `cross-site`/a foreign Origin. Requests with
+        neither header (e.g. the user typing a URL) are allowed through.
+        """
+        site = self.headers.get("Sec-Fetch-Site")
+        if site is not None and site not in ("same-origin", "same-site", "none"):
+            return False
+        origin = self.headers.get("Origin")
+        if origin:
+            host = urllib.parse.urlparse(origin).hostname
+            if host not in ALLOWED_HOSTNAMES:
+                return False
+        return True
+
+    def _guard(self, check_origin):
+        """Return True if the request may proceed; else send 403 and return False."""
+        if not self._hostname_ok():
+            self._error(403, "Forbidden host")
+            return False
+        if check_origin and not self._same_origin():
+            self._error(403, "Cross-site request blocked")
+            return False
+        return True
+
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
+
+        # /open-pdf launches a file via macOS `open`, so it must be same-origin.
+        if not self._guard(check_origin=path.startswith("/open-pdf/")):
+            return
 
         if path == "/api/courses":
             self._json_response(BASE_DIR / "data" / "courses.json")
@@ -160,6 +213,10 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
+
+        # Every POST mutates state or touches the filesystem — require same origin.
+        if not self._guard(check_origin=True):
+            return
 
         if path == "/api/rate":
             self._handle_rate()
@@ -291,6 +348,10 @@ class Handler(SimpleHTTPRequestHandler):
         subcourse_id = parts[0]
         filename = urllib.parse.unquote(parts[1])
 
+        if not is_safe_segment(filename):
+            self._error(400, "Invalid filename")
+            return
+
         # Find the pdfDir for this subcourse
         # Search all courses and subcourses for a match
         pdf_dir = None
@@ -377,6 +438,10 @@ class Handler(SimpleHTTPRequestHandler):
         self._json_data({"status": "ok"})
 
     def _handle_upload(self, card_id):
+        if not is_safe_segment(card_id):
+            self._error(400, "Invalid cardId")
+            return
+
         content_type = self.headers.get("Content-Type", "")
         if "multipart/form-data" not in content_type:
             self._error(400, "Expected multipart/form-data")
@@ -619,6 +684,9 @@ class Handler(SimpleHTTPRequestHandler):
         if not card_id:
             self._error(400, "cardId required")
             return
+        if not is_safe_segment(card_id):
+            self._error(400, "Invalid cardId")
+            return
 
         with open(BASE_DIR / "data" / "courses.json") as f:
             courses = json.load(f)
@@ -788,6 +856,9 @@ class Handler(SimpleHTTPRequestHandler):
         if not card_id or not filename:
             self._error(400, "cardId and filename required")
             return
+        if not is_safe_segment(card_id) or not is_safe_segment(filename):
+            self._error(400, "Invalid cardId or filename")
+            return
 
         # Delete the file
         filepath = UPLOADS_DIR / card_id / filename
@@ -870,7 +941,7 @@ class Handler(SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
     server = HTTPServer(("localhost", port), Handler)
-    print(f"Prelim Flashcard Server running at http://localhost:{port}")
+    print(f"Chalk server running at http://localhost:{port}")
     print("Press Ctrl+C to stop.")
     try:
         server.serve_forever()

@@ -1,4 +1,4 @@
-/* ── Prelim Flashcard App ────────────────────────────────────────
+/* ── Chalk — Flashcard App ───────────────────────────────────────
    All client-side logic. No dependencies beyond KaTeX (loaded in HTML).
 
    To add new courses: only data/courses.json and data files need to change.
@@ -1512,10 +1512,14 @@ function renderCatalogueTable() {
             .replace(/\*\*/g, "")
             .substring(0, 100);
 
+        // Escape every value that originates in course JSON (statement, course,
+        // assignment, number) — an imported/contributed deck must not be able to
+        // inject HTML into the catalogue. badgeClass/badgeText/historyStr are
+        // internally derived (class names and numbers), so they're already safe.
         tr.innerHTML = `
-            <td>${p._course} ${p._assignment}</td>
-            <td>${p.number}</td>
-            <td class="cat-statement">${plainStatement}</td>
+            <td>${escapeHtml(p._course)} ${escapeHtml(p._assignment)}</td>
+            <td>${escapeHtml(String(p.number))}</td>
+            <td class="cat-statement">${escapeHtml(plainStatement)}</td>
             <td><span class="badge ${badgeClass}">${badgeText}</span></td>
             <td class="confidence-history">${historyStr || "—"}</td>
             <td class="cat-delete-cell"><button class="cat-delete-btn" title="Delete card" aria-label="Delete card">&times;</button></td>
