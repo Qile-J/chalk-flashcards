@@ -78,8 +78,8 @@ See everything once, then drill weakest-first — automatically. Plus per-card t
 **macOS**, **Python 3** (already on every Mac), a browser. Nothing to install.
 
 ```bash
-git clone https://github.com/your-username/chalk.git
-cd chalk
+git clone https://github.com/Qile-J/chalk-flashcards.git
+cd chalk-flashcards
 python3 server.py
 ```
 
