@@ -6,7 +6,8 @@
 
 ### Find what you don't know yet — then drill it until you do.
 
-A local-first flashcard app built for **proofs, problem sets, and anything you work out by hand.**
+A local-first flashcard app for **graduate qualifying and preliminary exams in math** —
+proofs, problem sets, and everything you work out by hand.
 Rate your confidence, and Chalk keeps surfacing your weakest cards until they aren't weak anymore.
 
 <br/>
@@ -26,6 +27,12 @@ single card and spends your study time where it actually matters — the stuff y
 letting you keep a full digital record of work you do on **paper or a blackboard.**
 
 It runs entirely on your own machine. No account, no cloud, no tracking, no build step. Just Python and a browser.
+
+> **Why it exists.** I built Chalk to get through my graduate **preliminary exam in math** — hundreds of
+> proof-based problems across real analysis, functional analysis, probability, and finite elements, where the
+> only way through is knowing exactly which ones you *can't* yet do. Re-reading proofs you've already mastered
+> feels productive and changes nothing. Chalk is built to drag you back to the cards you'd rather avoid — and to
+> keep every handwritten proof you've sweated over in one place. It's the tool I wish I'd had on day one of prep.
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -147,7 +154,7 @@ No `node_modules`. No build step. Clone it and run it.
 
 <div align="center">
 
-Built for everyone studying something genuinely hard. ◇
+Built for everyone grinding through a math prelim — and anyone studying something genuinely hard. ◇
 
 **[Get started](#-quick-start)** · **[Add a course](CONTRIBUTING.md)** · **[MIT License](LICENSE)**
 
