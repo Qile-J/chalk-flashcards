@@ -28,19 +28,11 @@ straight to your weak spots — while keeping a digital record of the work you d
 > proof-based problems where the only way through is knowing which ones you *can't* yet do. Re-reading proofs
 > you've mastered feels productive and changes nothing; Chalk drags you back to the ones you'd avoid.
 
-```
-┌──────────────────────────────────────────────────────┐
-│  2:14                                           Edit   │
-│                                                        │
-│        Let (X, 𝓜, μ) be a measure space with          │
-│        μ(X) < ∞.  Show that L²(μ) ⊆ L¹(μ).             │
-│                                                        │
-│            ▸ Show Hint                                 │
-│            tap or press Space to flip                  │
-└──────────────────────────────────────────────────────┘
-        How confident are you?   0 ──────●──── 10
-                                         4
-```
+<div align="center">
+
+<img src="assets/image.png" alt="A Chalk flashcard: a Real Analysis problem rendered with KaTeX, with timer, hint, and source label" width="760" />
+
+</div>
 
 ---
 
