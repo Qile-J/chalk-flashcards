@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chalk</title>
+    <link rel="stylesheet" href="/vendor/katex/katex.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+    <!-- Global controls -->
+    <button class="fancy-toggle" id="fancy-toggle" onclick="toggleFancyMode()">FANCY</button>
+    <iframe id="bg-music" style="display:none" allow="autoplay"></iframe>
+
+    <!-- Landing: course selection -->
+    <div id="view-landing" class="view active">
+        <div class="landing-aurora" aria-hidden="true"></div>
+        <div class="landing-container">
+            <div class="landing-masthead">
+                <span class="landing-mono" aria-hidden="true">
+                    <svg class="landing-mark" width="14" height="14" viewBox="0 0 14 14">
+                        <rect x="1.5" y="1.5" width="11" height="11" transform="rotate(45 7 7)" fill="none" stroke="currentColor" stroke-width="1.2"/>
+                    </svg>
+                    <span class="landing-mono-label" id="landing-count"></span>
+                </span>
+                <span class="landing-meta" id="landing-meta"></span>
+            </div>
+            <div class="landing-rule" aria-hidden="true"></div>
+            <div id="course-list"></div>
+            <div class="landing-rule landing-rule-bottom" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <!-- Course home: study or catalogue -->
+    <div id="view-course" class="view">
+        <div class="course-container">
+            <button class="back-btn" onclick="showView('landing')">&larr; Back</button>
+            <h1 id="course-title"></h1>
+            <div class="course-actions">
+                <button class="big-btn" onclick="startStudy()">Study</button>
+                <button class="big-btn secondary" onclick="showCatalogue()">Catalogue</button>
+            </div>
+            <div id="study-progress-summary"></div>
+        </div>
+    </div>
+
+    <!-- Study mode: card front -->
+    <div id="view-card-front" class="view">
+        <div class="card-front-container">
+            <div class="card-progress" id="card-progress"></div>
+            <div class="card-nav">
+                <button class="nav-btn" onclick="skipPrev()" title="Previous">&larr;</button>
+                <button class="nav-btn" onclick="skipNext()" title="Next">&rarr;</button>
+                <button class="edit-card-btn" id="edit-card-btn" onclick="openCardEdit()" title="Edit statement and hint">Edit</button>
+            </div>
+            <div class="card-timer" id="card-timer">0:00</div>
+            <div class="card-display" id="card-display">
+                <div class="card-statement" id="card-statement"></div>
+                <div class="card-hint-area">
+                    <button class="hint-btn" id="hint-btn" onclick="toggleHint()">Show Hint</button>
+                    <div class="hint-text" id="hint-text"></div>
+                </div>
+                <div class="card-source" id="card-source"></div>
+                <div class="card-flip-hint">tap or press Space to flip</div>
+            </div>
+            <div class="card-edit" id="card-edit">
+                <label class="card-edit-label">Statement</label>
+                <textarea id="edit-statement-ta" rows="8" placeholder="Problem statement (LaTeX: $...$)"></textarea>
+                <label class="card-edit-label">Hint</label>
+                <textarea id="edit-hint-ta" rows="4" placeholder="Hint (LaTeX: $...$)"></textarea>
+                <div class="card-edit-actions">
+                    <button class="action-btn" onclick="saveCardEdit()">Save</button>
+                    <button class="action-btn secondary" onclick="cancelCardEdit()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Study mode: card back -->
+    <div id="view-card-back" class="view">
+        <div class="card-back-container">
+            <button class="back-btn back-btn-arrow" onclick="showCardFront()" aria-label="Back to front">&larr;</button>
+            <div class="card-statement-small" id="card-statement-back"></div>
+            <div class="card-back-actions">
+                <button class="action-btn" id="btn-open-pdf" onclick="openSolutionPdf()">Open Solution PDF</button>
+                <button class="action-btn" id="btn-ask-claude" onclick="askClaude()">Copy for Claude</button>
+            </div>
+            <div class="confidence-section">
+                <label>How confident are you? (0 = no idea, 10 = mastered)</label>
+                <div class="confidence-slider" id="confidence-slider"></div>
+                <button class="action-btn done-btn" id="btn-done" onclick="submitRating()">Done</button>
+            </div>
+            <div class="comments-section">
+                <h3>Comments</h3>
+                <div class="comment-view" id="comment-view">
+                    <div id="comment-rendered" class="comment-rendered"></div>
+                    <button class="action-btn comment-edit-btn" id="btn-edit-comment" onclick="editComment()">Edit</button>
+                </div>
+                <textarea id="comment-textarea" rows="4" placeholder="Write notes about this problem…"></textarea>
+                <button class="action-btn" id="btn-save-comment" onclick="saveComment()">Save</button>
+            </div>
+            <div class="images-section">
+                <h3>My Work</h3>
+                <div class="carousel" id="image-carousel">
+                    <button class="carousel-arrow carousel-prev" onclick="carouselPrev()">&lsaquo;</button>
+                    <div class="carousel-track" id="carousel-track"></div>
+                    <button class="carousel-arrow carousel-next" onclick="carouselNext()">&rsaquo;</button>
+                    <div class="carousel-counter" id="carousel-counter"></div>
+                </div>
+                <label class="upload-btn">
+                    Upload Photo
+                    <input type="file" accept="image/*" multiple onchange="uploadImage(event)" hidden>
+                </label>
+                <button class="upload-btn" onclick="takePhoto()">Take Photo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox for viewing images -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-nav lightbox-prev" onclick="event.stopPropagation(); lightboxPrev()" aria-label="Previous">&lsaquo;</button>
+        <img id="lightbox-img" src="" onclick="event.stopPropagation()">
+        <button class="lightbox-nav lightbox-next" onclick="event.stopPropagation(); lightboxNext()" aria-label="Next">&rsaquo;</button>
+        <button class="lightbox-zoom lightbox-zoom-out" onclick="event.stopPropagation(); lightboxZoomOut()" aria-label="Zoom out" title="Zoom out">&minus;</button>
+        <button class="lightbox-zoom lightbox-zoom-in" onclick="event.stopPropagation(); lightboxZoomIn()" aria-label="Zoom in" title="Zoom in">+</button>
+        <button class="lightbox-rotate" onclick="event.stopPropagation(); lightboxRotate()" aria-label="Rotate 90°" title="Rotate 90°">&#x21bb;</button>
+        <button class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()" aria-label="Close">&times;</button>
+        <div class="lightbox-counter" id="lightbox-counter"></div>
+    </div>
+
+    <!-- Catalogue -->
+    <div id="view-catalogue" class="view">
+        <div class="catalogue-container">
+            <button class="back-btn" onclick="showView('course')">&larr; Back</button>
+            <h1>Catalogue</h1>
+            <div class="catalogue-filters">
+                <select id="catalogue-filter-subcourse">
+                    <option value="all">All Subcourses</option>
+                </select>
+                <select id="catalogue-sort">
+                    <option value="source">Sort by Source</option>
+                    <option value="confidence-asc">Sort by Confidence (Low first)</option>
+                    <option value="confidence-desc">Sort by Confidence (High first)</option>
+                    <option value="unrated">Unrated First</option>
+                </select>
+                <button class="action-btn" id="btn-add-card" onclick="openAddCardForm()">+ Add Card</button>
+            </div>
+            <div id="catalogue-table"></div>
+            <div class="catalogue-bottom-actions">
+                <button class="danger-btn" onclick="clearAllHistory()">Clear All History</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Course modal -->
+    <div id="add-course-modal" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="closeAddCourseForm()"></div>
+        <div class="modal-panel">
+            <h2>Add New Course</h2>
+            <label class="modal-label">Course name</label>
+            <input type="text" id="add-course-name" placeholder="e.g. Numerical Analysis">
+            <div class="modal-hint">ID / folder slug: <span id="add-course-slug">—</span></div>
+            <div class="modal-actions">
+                <button class="action-btn" onclick="submitAddCourse()">Create</button>
+                <button class="action-btn secondary" onclick="closeAddCourseForm()">Cancel</button>
+            </div>
+            <div id="add-course-error" class="modal-error"></div>
+        </div>
+    </div>
+
+    <!-- Add Card modal -->
+    <div id="add-card-modal" class="modal" style="display:none">
+        <div class="modal-backdrop" onclick="closeAddCardForm()"></div>
+        <div class="modal-panel">
+            <h2>Add New Card</h2>
+            <label class="modal-label">Assignment</label>
+            <select id="add-assignment" onchange="onAddAssignmentChange()"></select>
+            <div id="add-new-assignment-row" style="display:none">
+                <label class="modal-label">New assignment name</label>
+                <input type="text" id="add-new-assignment-name" placeholder="e.g. Custom Set 1">
+                <div class="modal-hint">File/ID slug: <span id="add-new-assignment-slug">—</span></div>
+            </div>
+            <label class="modal-label">Statement (LaTeX: $...$, $$...$$)</label>
+            <textarea id="add-statement" rows="6" placeholder="Problem statement"></textarea>
+            <label class="modal-label">Hint</label>
+            <textarea id="add-hint" rows="3" placeholder="Optional hint"></textarea>
+            <label class="modal-label">Solution file (optional)</label>
+            <div class="modal-path-row">
+                <input type="text" id="add-solution-file" placeholder="(blank — will open Course Materials folder)" readonly>
+                <button class="action-btn secondary" onclick="pickSolutionFile()">Browse…</button>
+                <button class="action-btn secondary" onclick="clearSolutionFile()">Clear</button>
+            </div>
+            <div class="modal-actions">
+                <button class="action-btn" onclick="submitAddCard()">Create</button>
+                <button class="action-btn secondary" onclick="closeAddCardForm()">Cancel</button>
+            </div>
+            <div id="add-card-error" class="modal-error"></div>
+        </div>
+    </div>
+
+    <script src="/vendor/katex/katex.min.js"></script>
+    <script src="/app.js?v=bold1"></script>
+</body>
+</html>

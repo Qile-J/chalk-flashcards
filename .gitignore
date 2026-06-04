@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Temp files
+*.tmp
+state/progress.tmp
+
+# Personal study data — never commit your own progress or photos.
+# (Course content under data/ IS tracked, so you can share and PR courses.)
+state/progress.json
+uploads/*
+!uploads/.gitkeep
