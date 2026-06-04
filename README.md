@@ -6,9 +6,8 @@
 
 ### Find what you don't know yet — then drill it until you do.
 
-A local-first flashcard app for **graduate qualifying and preliminary exams in math** —
-proofs, problem sets, and everything you work out by hand.
-Rate your confidence, and Chalk keeps surfacing your weakest cards until they aren't weak anymore.
+A local-first flashcard app for **graduate qualifying and preliminary exams in math**.
+Rate your confidence; Chalk keeps surfacing your weakest cards until they aren't weak anymore.
 
 <br/>
 
@@ -22,17 +21,12 @@ Rate your confidence, and Chalk keeps surfacing your weakest cards until they ar
 
 ---
 
-Most flashcard apps treat every card the same. Chalk doesn't. It tracks how confident you feel on every
-single card and spends your study time where it actually matters — the stuff you're shakiest on — while
-letting you keep a full digital record of work you do on **paper or a blackboard.**
+Most flashcard apps treat every card the same. Chalk tracks how confident you are on each one and sends you
+straight to your weak spots — while keeping a digital record of the work you do on **paper or a blackboard.**
 
-It runs entirely on your own machine. No account, no cloud, no tracking, no build step. Just Python and a browser.
-
-> **Why it exists.** I built Chalk to get through my graduate **preliminary exam in math** — hundreds of
-> proof-based problems across real analysis, functional analysis, probability, and finite elements, where the
-> only way through is knowing exactly which ones you *can't* yet do. Re-reading proofs you've already mastered
-> feels productive and changes nothing. Chalk is built to drag you back to the cards you'd rather avoid — and to
-> keep every handwritten proof you've sweated over in one place. It's the tool I wish I'd had on day one of prep.
+> **Why it exists.** I built Chalk to get through my graduate **math preliminary exam** — hundreds of
+> proof-based problems where the only way through is knowing which ones you *can't* yet do. Re-reading proofs
+> you've mastered feels productive and changes nothing; Chalk drags you back to the ones you'd avoid.
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -54,41 +48,34 @@ It runs entirely on your own machine. No account, no cloud, no tracking, no buil
 
 ### 🎯 &nbsp;Confidence scoring that hunts your weak spots
 
-This is the heart of Chalk. After each card you rate your confidence **0–10**, and Chalk remembers every
-rating you've ever given. That history drives what you see next:
+Rate each card **0–10**. Chalk remembers every rating and uses it to decide what's next:
 
-- **First pass** — go through every card once, shuffled, so nothing gets skipped.
-- **Review** — once you've seen everything, Chalk re-sorts the deck **lowest-confidence-first**. Every time
-  you rate a card the queue rebuilds, so your weakest cards keep floating to the top until they stop being weak.
-- **Catalogue** — the whole deck at a glance with **red / yellow / green** confidence badges and full rating
-  history, sortable by *weakest first*.
+- **First pass** — every card once, shuffled, nothing skipped.
+- **Review** — the deck re-sorts **lowest-confidence-first**, rebuilding after every rating so your weakest cards stay on top until they aren't.
+- **Catalogue** — the whole deck with **red / yellow / green** badges and full history, sortable by *weakest first*.
 
-You stop re-reading what you already know and start fixing what you don't.
+Stop re-reading what you know. Start fixing what you don't.
 
 ### ✍️ &nbsp;Photograph your handwritten work
 
-The best math and science gets done with a pen, on paper or at a blackboard — Chalk lets you keep all of it
-digitally. Snap a photo straight from your webcam or upload one for any card. Your worked solutions live
-right next to the problem in a swipeable carousel, with a fullscreen lightbox, zoom, and rotate. Think in
-ink, keep a clean digital record.
+Snap a photo from your webcam or upload one — your worked solutions live right next to the problem in a
+carousel with lightbox, zoom, and rotate. Think in ink, keep a clean digital record.
 
 ### ∑ &nbsp;Markdown + LaTeX, beautifully rendered
 
-Problem statements and your own notes both render real math with [KaTeX](https://katex.org/) — `$...$` inline,
-`$$...$$` display. Write notes per card in Markdown + LaTeX and they're typeset on the spot. No fighting with
-plain-text equations.
+Problems and notes render real math with [KaTeX](https://katex.org/) — `$...$` inline, `$$...$$` display.
+Write per-card notes in Markdown + LaTeX, typeset on the spot.
 
 ### 🔁 &nbsp;A study loop that remembers
 
-See everything once, then drill weakest-first — automatically. Per-card timers keep you honest, one-sentence
-hints unstick you without giving it away, and a **"Copy for Claude"** button hands any problem to your AI tutor
-with a prompt tuned for rigorous, double-checked reasoning.
+See everything once, then drill weakest-first — automatically. Plus per-card timers, one-sentence hints, and a
+**"Copy for Claude"** button that hands any problem to your AI tutor.
 
 ---
 
 ## ◇ Quick start
 
-You need **macOS**, **Python 3** (already installed on every Mac), and a browser. Nothing to install.
+**macOS**, **Python 3** (already on every Mac), a browser. Nothing to install.
 
 ```bash
 git clone https://github.com/your-username/chalk.git
@@ -96,20 +83,16 @@ cd chalk
 python3 server.py
 ```
 
-Then open **http://localhost:8000**.
+Open **http://localhost:8000** — or just double-click **`Start Chalk.command`**.
 
-Prefer a double-click? Use **`Start Chalk.command`** — it launches the server and opens the app for you.
-
-> Chalk ships empty so it's yours from the first launch. Hit **+ New course** on the landing page to start
-> building, or drop in a ready-made deck (see below).
+> Ships empty — hit **+ New course** to start, or drop in a ready-made deck (below).
 
 ---
 
 ## ◇ Add your own courses
 
-A course is just data — **no code changes required.** Register it in `data/courses.json`, then add one JSON
-file per assignment with your problems. You can do the whole thing from inside the app with the **+ New course**
-and **+ Add Card** buttons, or edit the files directly.
+A course is just data — **no code changes.** Add it from inside the app (**+ New course**, **+ Add Card**) or
+edit the JSON directly:
 
 ```json
 {
@@ -121,32 +104,30 @@ and **+ Add Card** buttons, or edit the files directly.
 }
 ```
 
-Full schema, the data model, and the recommendation algorithm are documented in
-[`CLAUDE.md`](CLAUDE.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Full schema in [`CLAUDE.md`](CLAUDE.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
 
 ## ◇ Contribute — bring your courses with you
 
-**The best thing you can do for Chalk is share the deck you're studying.** Prelims, quals, finals — whatever
-you're grinding through, someone else is too. If you've built a Real Analysis, Probability, Algebra, Topology,
-or ML deck, **open a PR and add it** so the next student doesn't start from a blank page.
+**The best thing you can do for Chalk is share the deck you're studying.** Built a Real Analysis, Probability,
+Algebra, Topology, or ML deck? **Open a PR** so the next student doesn't start from a blank page.
 
-- 📚 **Add a course** — share your problems and hints. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the one-file-per-assignment format.
+- 📚 **Add a course** — see [`CONTRIBUTING.md`](CONTRIBUTING.md) for the format.
 - 🛠️ **Improve the app** — features and fixes welcome; keep it dependency-free.
 - 💡 **Have an idea?** Open an issue.
 
-> Only contribute content you have the right to share — original or openly-licensed problems, not copyrighted
-> solution manuals. Your personal progress and photos are gitignored, so they never end up in a PR.
+> Share only what you have the right to — original or openly-licensed problems, not copyrighted solution
+> manuals. Your progress and photos are gitignored, so they never end up in a PR.
 
 ---
 
 ## ◇ Built with
 
 - **Vanilla JavaScript** — no framework, no bundler
-- **Python standard library** — the entire server is one file, zero pip installs
+- **Python standard library** — the whole server is one file, zero pip installs
 - **[KaTeX](https://katex.org/)** — vendored locally for fast, offline math rendering
-- **Your machine, only** — everything stays local; no account, no cloud, no telemetry
+- **Your machine, only** — no account, no cloud, no telemetry
 
 No `node_modules`. No build step. Clone it and run it.
 
